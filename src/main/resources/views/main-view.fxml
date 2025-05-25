@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Importations des classes JavaFX nécessaires -->
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<!-- Conteneur principal BorderPane avec contrôleur associé et feuille de style externe -->
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.MainController" style="-fx-background-color: #f5f9fc;"
+            stylesheets="@/styles.css">
+
+    <!-- ========== SECTION EN-TÊTE ========== -->
+    <top>
+        <!-- Conteneur vertical pour l'en-tête -->
+        <VBox alignment="CENTER" style="-fx-background-color: #2a8bf2; -fx-padding: 0;">
+            <!-- Conteneur horizontal pour le logo et le titre -->
+            <HBox alignment="CENTER">
+                <!-- Logo de l'application -->
+                <ImageView fitHeight="80" fitWidth="80" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/photoPharmacie1.png" />
+                    </image>
+                </ImageView>
+                <!-- Titre de l'application -->
+                <Text text="PharmaSoft Pro" style="-fx-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ========== SECTION MENU LATÉRAL ========== -->
+    <left>
+        <!-- Conteneur vertical pour le menu -->
+        <VBox spacing="10" style="-fx-background-color: #e3f2fd; -fx-padding: 10; -fx-min-width: 180;">
+
+            <!-- Bouton Clients avec icône -->
+            <Button fx:id="clientButton" text="Clients" onAction="#showClientInterface" styleClass="menu-button">
+                <graphic>
+                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <image>
+                            <Image url="@../images/icons8-clients-64.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <!-- Bouton Médicaments avec icône -->
+            <Button fx:id="medicamentButton" text="Médicaments" onAction="#showMedicamentInterface" styleClass="menu-button">
+                <graphic>
+                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <image>
+                            <Image url="@../images/icons8-antibiotique-48.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <!-- Bouton Factures avec icône -->
+            <Button fx:id="factureButton" text="Factures" onAction="#showFactureInterface" styleClass="menu-button">
+                <graphic>
+                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <image>
+                            <Image url="@../images/icons8-vérifier-48.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <!-- Bouton Liste des Factures avec icône -->
+            <Button fx:id="factureListButton" text="Liste Factures" onAction="#showFactureList" styleClass="menu-button">
+                <graphic>
+                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <image>
+                            <Image url="@../images/icons8-liste-restreinte-50.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+
+            <!-- Bouton Quitter avec icône -->
+            <Button text="Quitter" onAction="#quitApplication" styleClass="quit-button">
+                <graphic>
+                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <image>
+                            <Image url="@../images/icons8-quitter-48.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </VBox>
+    </left>
+
+    <!-- ========== SECTION CONTENU PRINCIPAL ========== -->
+    <center>
+        <!-- StackPane qui contiendra les différentes vues -->
+        <StackPane fx:id="contentPane" style="-fx-padding: 0;">
+            <!-- Vue d'accueil par défaut -->
+            <VBox alignment="CENTER" spacing="20" style="-fx-background-color: #f5f9fc;">
+                <Text text="Bienvenue sur PharmaSoft Pro" style="-fx-fill: #2a8bf2; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                <Text text="Votre solution complète de gestion pharmaceutique" style="-fx-fill: #555; -fx-font-size: 16px;"/>
+                <Text text="Sélectionnez une option dans le menu à gauche pour commencer" style="-fx-fill: #777; -fx-font-size: 14px;"/>
+            </VBox>
+        </StackPane>
+    </center>
+
+    <!-- ========== SECTION PIED DE PAGE ========== -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color: #e3f2fd; -fx-padding: 10;">
+            <Label text="© 2025 PharmaSoft Pro - Tous droits réservés" style="-fx-text-fill: #555;" />
+        </HBox>
+    </bottom>
+</BorderPane>

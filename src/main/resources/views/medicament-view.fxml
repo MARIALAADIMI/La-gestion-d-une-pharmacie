@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Importations des classes JavaFX nécessaires -->
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<!-- Conteneur principal BorderPane avec contrôleur associé -->
+<BorderPane prefHeight="1000" prefWidth="1000" style="-fx-background-color: #f5f5f5;"
+            xmlns="http://javafx.com/javafx/17.0.2-ea"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.MedicamentController">
+
+    <!-- ========== SECTION CENTRALE ========== -->
+    <center>
+        <!-- SplitPane pour diviser l'écran en deux parties -->
+        <SplitPane dividerPositions="0.5">
+
+            <!-- ===== PARTIE GAUCHE - FORMULAIRE ===== -->
+            <VBox style="-fx-padding: 8; -fx-spacing: 6; -fx-background-color: white; -fx-min-width: 200px; -fx-max-width: 200px;">
+                <!-- Titre du formulaire -->
+                <Label style="-fx-font-size: 12px; -fx-font-weight: bold;" text="Formulaire Médicament" underline="true" textFill="#9f1c1c">
+                    <font>
+                        <Font name="System Bold" size="12.0" />
+                    </font>
+                </Label>
+
+                <!-- Grille pour les champs du formulaire -->
+                <GridPane style="-fx-vgap: 4; -fx-hgap: 4;">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" hgrow="NEVER" prefWidth="60" />
+                        <ColumnConstraints hgrow="NEVER" prefWidth="110" />
+                    </columnConstraints>
+
+                    <!-- Champ Code Barre -->
+                    <Label text="Code Barre*:" textFill="#1d3ade">
+                        <font>
+                            <Font size="11.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="codeBarreField" maxWidth="110" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <!-- Champ Nom -->
+                    <Label text="Nom*:" textFill="#1d3ade" GridPane.rowIndex="1">
+                        <font>
+                            <Font size="11.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="nomField" maxWidth="110" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <!-- Champ Forme -->
+                    <Label text="Forme:" textFill="#1d3ade" GridPane.rowIndex="2">
+                        <font>
+                            <Font size="11.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="formeField" maxWidth="110" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                    <!-- Champ Dosage -->
+                    <Label text="Dosage:" textFill="#1d3ade" GridPane.rowIndex="3">
+                        <font>
+                            <Font size="11.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="dosageField" maxWidth="110" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                    <!-- Champ Prix -->
+                    <Label text="Prix*:" textFill="#1d3ade" GridPane.rowIndex="4">
+                        <font>
+                            <Font size="11.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="prixField" maxWidth="110" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                    <!-- Champ Stock -->
+                    <Label text="Stock*:" textFill="#1d3ade" GridPane.rowIndex="5">
+                        <font>
+                            <Font size="11.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="stockField" maxWidth="110" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                    <!-- Case à cocher Remboursable -->
+                    <Label text="Remboursable:" textFill="#1d3ade" GridPane.rowIndex="6">
+                        <font>
+                            <Font size="11.0" />
+                        </font>
+                    </Label>
+                    <CheckBox fx:id="remboursableCheck" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+
+                    <rowConstraints>
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                    </rowConstraints>
+                </GridPane>
+
+                <!-- Boutons Enregistrer/Annuler -->
+                <HBox alignment="CENTER" spacing="4">
+                    <Button fx:id="btnEnregistrer" onAction="#handleSaveMedicament"
+                            style="-fx-base: #4CAF50; -fx-text-fill: white; -fx-font-size: 11px; -fx-min-width: 80px; -fx-max-height: 25px;"
+                            text="Save" />
+                    <Button fx:id="btnAnnuler" onAction="#handleCancel"
+                            style="-fx-base: #9E9E9E; -fx-text-fill: white; -fx-font-size: 11px; -fx-min-width: 80px; -fx-max-height: 25px;"
+                            text="Annuler" />
+                </HBox>
+
+                <!-- Section Modification de Stock -->
+                <Label style="-fx-font-size: 12px; -fx-font-weight: bold;" underline="true" text="Modification De Stock" textFill="#9f1c1c" />
+                <GridPane prefHeight="100.0" prefWidth="200.0" style="-fx-vgap: 8; -fx-hgap: 10;">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" prefWidth="120" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="25" prefHeight="25" vgrow="NEVER" />
+                        <RowConstraints minHeight="25" prefHeight="25" vgrow="NEVER" />
+                        <RowConstraints minHeight="25" prefHeight="25" vgrow="NEVER" />
+                    </rowConstraints>
+
+                    <!-- Affichage du stock actuel -->
+                    <Label text="Stock actuel:" textFill="#143fea" GridPane.rowIndex="0">
+                        <font>
+                            <Font size="11.0" />
+                        </font>
+                    </Label>
+                    <Label fx:id="currentStockLabel" style="-fx-text-fill: #2196F3;" text="0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <!-- Champ pour ajouter du stock -->
+                    <Label text="Quantité à ajouter:" textFill="#143fea" GridPane.rowIndex="1">
+                        <font>
+                            <Font size="11.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="stockAdditionField" prefHeight="25.0" prefWidth="81.0"
+                               promptText="Entrez la quantité" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <!-- Affichage du nouveau stock calculé -->
+                    <Label text="Nouveau stock:" textFill="#143fea" GridPane.rowIndex="2">
+                        <font>
+                            <Font size="11.0" />
+                        </font>
+                    </Label>
+                    <Label fx:id="newStockLabel" style="-fx-text-fill: #4CAF50; -fx-font-weight: bold;"
+                           text="0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                </GridPane>
+
+                <!-- Boutons Valider/Annuler pour la modification de stock -->
+                <HBox prefHeight="0.0" prefWidth="184.0" spacing="10" style="-fx-padding: 10 0 0 0; -fx-alignment: CENTER_RIGHT;">
+                    <Button onAction="#handleStockUpdate"
+                            style="-fx-base: #4CAF50; -fx-text-fill: white; -fx-min-width: 80px;"
+                            text="Valider" />
+                    <Button onAction="#handleCancelStockUpdate"
+                            style="-fx-base: #9E9E9E; -fx-text-fill: white; -fx-min-width: 80px;"
+                            text="Annuler" />
+                </HBox>
+            </VBox>
+
+            <!-- ===== PARTIE DROITE - TABLEAU ET RECHERCHE ===== -->
+            <VBox style="-fx-spacing: 8;">
+                <!-- Barre d'outils de recherche -->
+                <HBox style="-fx-padding: 8; -fx-spacing: 8; -fx-background-color: #eeeeee;">
+                    <TextField fx:id="searchField" maxWidth="200" prefWidth="200"
+                               promptText="Rechercher par code barre ou nom..." />
+                    <Button onAction="#handleSearch"
+                            style="-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 80px;"
+                            text="Rechercher" />
+                    <Button onAction="#refreshData"
+                            style="-fx-base: #607D8B; -fx-text-fill: white; -fx-min-width: 80px;"
+                            text="Actualiser" />
+                </HBox>
+
+                <!-- Tableau des médicaments -->
+                <TableView fx:id="medicamentTable" prefHeight="400.0" prefWidth="734.0" style="-fx-background-color: white;">
+                    <columns>
+                        <TableColumn fx:id="colCodeBarre" prefWidth="100" text="Code Barre" />
+                        <TableColumn fx:id="colNom" prefWidth="120" text="Nom" />
+                        <TableColumn fx:id="colForme" prefWidth="80" text="Forme" />
+                        <TableColumn fx:id="colDosage" prefWidth="80" text="Dosage" />
+                        <TableColumn fx:id="colPrix" prefWidth="70" text="Prix" />
+                        <TableColumn fx:id="colStock" prefWidth="60" text="Stock" />
+                        <TableColumn fx:id="colRemboursable" prefWidth="90" text="Remboursable" />
+                        <TableColumn fx:id="colDateAjout" prefWidth="100" text="Date Ajout" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </SplitPane>
+    </center>
+
+    <!-- ========== SECTION BAS - BARRE D'ACTIONS ========== -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10; -fx-background-color: #e0e0e0;">
+            <!-- Bouton Nouveau Médicament -->
+            <Button fx:id="btnNouveau" onAction="#handleNewMedicament"
+                    style="-fx-font-weight: bold;-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 110px;"
+                    text="Nouveau Médicament">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Button>
+
+            <!-- Bouton Modifier -->
+            <Button fx:id="btnModifier" onAction="#handleEditMedicament"
+                    style="-fx-base: #2196F3;-fx-font-weight: bold; -fx-text-fill: white; -fx-min-width: 90px;"
+                    text="Modifier" />
+
+            <!-- Bouton Modifier Stock -->
+            <Button fx:id="btnModifierStock" onAction="#showStockModificationPane"
+                    style="-fx-base: #2196F3;-fx-font-weight: bold; -fx-text-fill: white; -fx-min-width: 100px;"
+                    text="Modifier Stock" />
+
+            <!-- Bouton Supprimer -->
+            <Button fx:id="btnSupprimer" onAction="#handleDeleteMedicament"
+                    style="-fx-base: #2196F3;-fx-font-weight: bold; -fx-text-fill: white; -fx-min-width: 90px;"
+                    text="Supprimer" />
+
+            <!-- Bouton Stock Faible -->
+            <Button fx:id="btnStockFaible" onAction="#afficherStockFaible"
+                    style="-fx-base: #2196F3;-fx-font-weight: bold; -fx-text-fill: white; -fx-min-width: 100px; -fx-padding: 5;"
+                    text="Stock faible" />
+        </HBox>
+    </bottom>
+</BorderPane>

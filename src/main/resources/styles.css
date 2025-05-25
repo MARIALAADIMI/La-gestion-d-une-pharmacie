@@ -1,0 +1,117 @@
+
+/* ===== STYLES GÉNÉRAUX ===== */
+.root {
+    -fx-font-family: "Times New Roman (Titres CS)";
+    -fx-font-size: 11px;  /* Taille de base réduite */
+}
+
+/* ===== STRUCTURE PRINCIPALE ===== */
+.top VBox {
+    -fx-padding: 10px;
+    -fx-background-color: #2a8bf2;
+}
+
+.top Text {
+    -fx-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.top ImageView {
+    -fx-fit-height: 30px;
+    -fx-fit-width: 30px;
+}
+
+.content-pane {
+    -fx-padding: 15px;
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+}
+
+/* ===== STYLES DES BOUTONS ===== */
+.menu-button, .secondary-button, .quit-button {
+    -fx-pref-width: 150px;
+    -fx-padding: 6 8 6 12;
+    -fx-font-size: 11px;
+    -fx-graphic-text-gap: 8px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-content-display: LEFT;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+/* Boutons standards */
+.menu-button, .secondary-button {
+    -fx-background-color: white;
+    -fx-text-fill: #2a8bf2;
+    -fx-border-color: #2a8bf2;
+}
+
+/* Bouton Quitter */
+.quit-button {
+    -fx-background-color: white;
+    -fx-text-fill: #f44336;
+    -fx-border-color: #f44336;
+}
+
+/* Effets de survol */
+.menu-button:hover, .secondary-button:hover {
+    -fx-background-color: #f0f8ff;
+    -fx-border-color: #1a6bc8;
+    -fx-text-fill: #1a6bc8;
+}
+
+.quit-button:hover {
+    -fx-background-color: #ffebee;
+    -fx-border-color: #e53935;
+    -fx-text-fill: #e53935;
+}
+
+/* États pressés */
+.menu-button:pressed, .secondary-button:pressed {
+    -fx-background-color: #e0f0ff;
+}
+
+.quit-button:pressed {
+    -fx-background-color: #ffcdd2;
+}
+
+/* Style pour le bouton actif */
+.menu-button.active, .secondary-button.active {
+    -fx-background-color: #1a6bc8 !important;
+    -fx-text-fill: white !important;
+    -fx-border-color: #1a6bc8 !important;
+}
+
+/* Icônes */
+.menu-button > .graphic > .image-view,
+.secondary-button > .graphic > .image-view,
+.quit-button > .graphic > .image-view {
+    -fx-fit-height: 18px;
+    -fx-fit-width: 18px;
+}
+
+/* ===== COMPOSANTS DE FORMULAIRE ===== */
+.text-field, .combo-box, .choice-box {
+    -fx-font-size: 11px;
+    -fx-pref-height: 24px;
+}
+
+/* ===== TABLEAUX ===== */
+.table-view, .table-cell {
+    -fx-font-size: 10px;
+}
+
+.table-view .column-header .label {
+    -fx-font-size: 10px;
+}
+
+.table-row-cell {
+    -fx-cell-size: 24px;
+}

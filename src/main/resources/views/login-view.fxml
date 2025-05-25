@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Importations des classes JavaFX nécessaires -->
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<!-- Conteneur principal avec un contrôleur associé -->
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LoginController">
+    <!-- Arrière-plan avec dégradé de couleur bleu -->
+    <Pane style="-fx-background-color: linear-gradient(to bottom right, #4a6baf, #2a3f6f);"/>
+
+    <!-- Conteneur vertical pour le contenu principal -->
+    <VBox alignment="CENTER" spacing="10" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0); -fx-padding: 40 50 40 50;">
+        <!-- Logo de l'application -->
+        <ImageView fitHeight="150" fitWidth="150" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <!-- Chemin relatif vers l'image du logo -->
+                <Image url="@../images/photoPharmacie.png" />
+            </image>
+        </ImageView>
+
+        <!-- Titre de l'application -->
+        <Text fill="#2a3f6f"
+              fontSmoothingType="LCD"
+              style="-fx-font-family: 'Segoe UI', 'Arial', sans-serif;
+             -fx-font-size: 30px;
+             -fx-font-weight: bold;
+             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0.5, 1, 1);"
+              text="PharmaSoft Pro" />
+
+        <!-- Grille pour le formulaire de connexion -->
+        <GridPane alignment="CENTER" hgap="5" vgap="5" style="-fx-pref-width: 450;">
+            <!-- Conteneur pour les champs du formulaire -->
+            <VBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #f8fafc; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #e2e8f0; -fx-border-width: 2; -fx-padding: 25; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 12, 0, 0, 0);">
+
+                <!-- Champ pour le nom d'utilisateur -->
+                <Label text="Nom d'utilisateur" style="-fx-text-fill: #4a5568; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 5 0;" />
+                <TextField fx:id="usernameField" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #cbd5e0; -fx-border-width: 1.5; -fx-pref-height: 90; -fx-pref-width: 350; -fx-font-size: 12px; -fx-prompt-text-fill: #a0aec0; -fx-background-color: #ffffff; -fx-padding: 0 12 0 12;"
+                           promptText="Entrez votre nom d'utilisateur" />
+
+                <!-- Champ pour le mot de passe -->
+                <Label text="Mot de passe" style="-fx-text-fill: #4a5568; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 0 5 0;" />
+                <PasswordField fx:id="passwordField" style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #cbd5e0; -fx-border-width: 1.5; -fx-pref-height: 90; -fx-pref-width: 350; -fx-font-size: 12px; -fx-prompt-text-fill: #a0aec0; -fx-background-color: #ffffff; -fx-padding: 0 12 0 12;"
+                               promptText="Entrez votre mot de passe" />
+
+                <!-- Case à cocher "Se souvenir de moi" -->
+                <CheckBox fx:id="rememberMeCheck" text="Se souvenir de moi" style="-fx-text-fill: #4a5568; -fx-font-size: 14px; -fx-padding: 15 0 0 5;">
+                    <font>
+                        <Font name="System Regular" size="14" />
+                    </font>
+                </CheckBox>
+
+                <!-- Bouton de connexion -->
+                <Button fx:id="loginButton" onAction="#handleLogin" defaultButton="true"
+                        style="-fx-background-color: linear-gradient(to right, #4a6baf, #3b5998); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-pref-height: 45; -fx-pref-width: 350; -fx-font-size: 15px; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(74,107,175,0.3), 8, 0, 0, 2);"
+                        text="CONNEXION">
+                    <padding>
+                        <Insets top="8" bottom="8" left="15" right="15" />
+                    </padding>
+                </Button>
+            </VBox>
+        </GridPane>
+
+        <!-- Lien pour récupérer le mot de passe oublié -->
+        <Hyperlink text="Mot de passe oublié ?" style="-fx-text-fill: #4a6baf; -fx-border-color: transparent; -fx-underline: false;" onAction="#handleForgotPassword">
+            <padding>
+                <Insets top="10" />
+            </padding>
+        </Hyperlink>
+
+        <!-- Pied de page avec copyright -->
+        <Text fill="#777" fontSmoothingType="LCD" style="-fx-font-family: 'Segoe UI'; -fx-font-size: 11px;" text="© 2023 PharmaSoft Pro - Tous droits réservés" />
+    </VBox>
+</StackPane>
