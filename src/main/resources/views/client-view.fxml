@@ -4,70 +4,96 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane prefHeight="1000" prefWidth="1000" style="-fx-background-color: #f5f5f5;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ClientController">
-
+<!-- Conteneur principal BorderPane avec un fond gris clair -->
+<BorderPane prefHeight="1000" prefWidth="1000" style="-fx-background-color: #f5f5f5;"
+            xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.ClientController">
 
     <!-- **************************** -->
-    <!-- ******* CENTER: CONTENT ******* -->
+    <!-- ******* CENTRE : CONTENU ******* -->
     <!-- **************************** -->
     <center>
+        <!-- SplitPane divisant la zone centrale en deux parties égales -->
         <SplitPane dividerPositions="0.5" prefHeight="963.0" prefWidth="1023.0">
-            <!-- Left: Formulaire -->
 
-            <VBox maxWidth="234.0" prefHeight="954.0" prefWidth="234.0" style="-fx-padding: 0; -fx-background-color: white; -fx-spacing: 6; -fx-min-width: 150px; -fx-max-width: 200px;">
-                <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="36.0" prefWidth="200.0" underline="true" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Formulaire Client" textAlignment="CENTER" textFill="#9f2613" />
+            <!-- Partie GAUCHE : Formulaire Client -->
+            <VBox maxWidth="234.0" prefHeight="954.0" prefWidth="234.0"
+                  style="-fx-padding: 0; -fx-background-color: white; -fx-spacing: 6; -fx-min-width: 150px; -fx-max-width: 200px;">
 
+                <!-- Titre du formulaire -->
+                <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="36.0" prefWidth="200.0"
+                       underline="true" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Formulaire Client"
+                       textAlignment="CENTER" textFill="#9f2613" />
+
+                <!-- Grille du formulaire avec étiquettes et champs -->
                 <GridPane style="-fx-vgap: 4; -fx-hgap: 4;">
                     <columnConstraints>
+                        <!-- Colonne 1 : Alignée à droite pour les labels -->
                         <ColumnConstraints halignment="RIGHT" hgrow="NEVER" prefWidth="60" />
+                        <!-- Colonne 2 : champs de saisie -->
                         <ColumnConstraints hgrow="NEVER" prefWidth="110" />
                     </columnConstraints>
 
-                    <Label prefHeight="17.0" prefWidth="56.0" text="CIN*:" textFill="#2232be" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <!-- Champs du formulaire -->
+                    <Label text="CIN*:" textFill="#2232be" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                     <TextField fx:id="cinField" maxWidth="110" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                    <Label prefHeight="17.0" prefWidth="56.0" text="Nom*:" textFill="#2232be" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <Label text="Nom*:" textFill="#2232be" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                     <TextField fx:id="nomField" maxWidth="250" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                    <Label prefHeight="17.0" prefWidth="58.0" text="Prénom*:" textFill="#2232be" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <Label text="Prénom*:" textFill="#2232be" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                     <TextField fx:id="prenomField" maxWidth="110" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                    <Label prefHeight="17.0" prefWidth="57.0" text="Tél:" textFill="#2232be" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <Label text="Tél:" textFill="#2232be" GridPane.columnIndex="0" GridPane.rowIndex="3" />
                     <TextField fx:id="teleField" maxWidth="110" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                    <Label prefHeight="17.0" prefWidth="58.0" text="Adresse:" textFill="#2232be" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                    <TextArea fx:id="adresseField" maxWidth="110" prefRowCount="1" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                    <Label text="Adresse:" textFill="#2232be" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                    <TextArea fx:id="adresseField" maxWidth="110" prefRowCount="1" wrapText="true"
+                              GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
-                    <Label prefHeight="17.0" prefWidth="59.0" text="Date:" textFill="#2232be" GridPane.columnIndex="0" GridPane.rowIndex="5" />
-                    <DatePicker fx:id="dateField" maxWidth="110" showWeekNumbers="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-               <rowConstraints>
-                  <RowConstraints />
-                  <RowConstraints />
-                  <RowConstraints />
-                  <RowConstraints />
-                  <RowConstraints />
-                  <RowConstraints />
-               </rowConstraints>
+                    <Label text="Date:" textFill="#2232be" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                    <DatePicker fx:id="dateField" maxWidth="110" showWeekNumbers="false"
+                                GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                    <!-- Définitions des lignes pour uniformité -->
+                    <rowConstraints>
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                        <RowConstraints />
+                    </rowConstraints>
                 </GridPane>
 
+                <!-- Boutons d'action : Enregistrer et Annuler -->
                 <HBox alignment="CENTER" spacing="4">
-                    <Button fx:id="btnEnregistrer" onAction="#handleSaveClient" style="-fx-base: #4CAF50; -fx-text-fill: white; -fx-font-size: 11px; -fx-min-width: 80px; -fx-max-height: 25px;" text="Save" />
-                    <Button fx:id="btnAnnuler" onAction="#handleCancel" prefHeight="23.0" prefWidth="82.0" style="-fx-base: #9E9E9E; -fx-text-fill: white; -fx-font-size: 11px; -fx-min-width: 80px; -fx-max-height: 25px;" text="Annuler" />
+                    <Button fx:id="btnEnregistrer" onAction="#handleSaveClient"
+                            style="-fx-base: #4CAF50; -fx-text-fill: white; -fx-font-size: 11px; -fx-min-width: 80px; -fx-max-height: 25px;"
+                            text="Save" />
+                    <Button fx:id="btnAnnuler" onAction="#handleCancel" prefHeight="23.0" prefWidth="82.0"
+                            style="-fx-base: #9E9E9E; -fx-text-fill: white; -fx-font-size: 11px; -fx-min-width: 80px; -fx-max-height: 25px;"
+                            text="Annuler" />
                 </HBox>
             </VBox>
 
-            <!-- Right: Tableau et recherche -->
+            <!-- Partie DROITE : Tableau des clients et barre de recherche -->
             <VBox style="-fx-spacing: 8;">
-                <!-- Barre d'outils -->
+                <!-- Barre d'outils de recherche -->
                 <HBox style="-fx-padding: 8; -fx-spacing: 8; -fx-background-color: #eeeeee;">
-                    <TextField fx:id="searchField" maxWidth="200" prefWidth="200" promptText="Rechercher par CIN, Nom ou Prénom..." />
-                    <Button onAction="#handleSearch" style="-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 80px;" text="Rechercher" />
-                    <Button onAction="#refreshData" style="-fx-base: #607D8B; -fx-text-fill: white; -fx-min-width: 80px;" text="Actualiser" />
-
+                    <TextField fx:id="searchField" maxWidth="200" prefWidth="200"
+                               promptText="Rechercher par CIN, Nom ou Prénom..." />
+                    <Button onAction="#handleSearch"
+                            style="-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 80px;"
+                            text="Rechercher" />
+                    <Button onAction="#refreshData"
+                            style="-fx-base: #607D8B; -fx-text-fill: white; -fx-min-width: 80px;"
+                            text="Actualiser" />
                 </HBox>
 
-                <!-- Tableau des clients -->
-                <TableView fx:id="clientTable" prefHeight="400.0" prefWidth="734.0" style="-fx-background-color: white;">
+                <!-- Tableau affichant la liste des clients -->
+                <TableView fx:id="clientTable" prefHeight="400.0" prefWidth="734.0"
+                           style="-fx-background-color: white;">
                     <columns>
                         <TableColumn fx:id="colCIN" prefWidth="100" style="-fx-alignment: CENTER;" text="CIN" />
                         <TableColumn fx:id="colNom" prefWidth="120" text="Nom" />
@@ -82,26 +108,42 @@
     </center>
 
     <!-- ******************************** -->
-    <!-- ******* BOTTOM: ACTION BAR ******* -->
+    <!-- ******* BAS : BARRE D'ACTIONS ******* -->
     <!-- ******************************** -->
     <bottom>
+        <!-- Barre horizontale avec boutons d’action -->
         <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10; -fx-background-color: #e0e0e0;">
-            <Button fx:id="btnNouveau" onAction="#handleNewClient" style="-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 110px;" text="Nouveau Client">
-            <font>
-               <Font name="System Bold" size="11.0" />
-            </font></Button>
-            <Button fx:id="btnModifier" onAction="#handleEditClient" style="-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 90px;" text="Modifier">
-            <font>
-               <Font name="System Bold" size="11.0" />
-            </font></Button>
-            <Button fx:id="btnSupprimer" onAction="#handleDeleteClient" style="-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 90px;" text="Supprimer">
-            <font>
-               <Font name="System Bold" size="11.0" />
-            </font></Button>
-            <Button onAction="#handleAddFacture" style="-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 110px;" text="Ajouter Facture">
-            <font>
-               <Font name="System Bold" size="11.0" />
-            </font></Button>
+            <Button fx:id="btnNouveau" onAction="#handleNewClient"
+                    style="-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 110px;"
+                    text="Nouveau Client">
+                <font>
+                    <Font name="System Bold" size="11.0" />
+                </font>
+            </Button>
+
+            <Button fx:id="btnModifier" onAction="#handleEditClient"
+                    style="-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 90px;"
+                    text="Modifier">
+                <font>
+                    <Font name="System Bold" size="11.0" />
+                </font>
+            </Button>
+
+            <Button fx:id="btnSupprimer" onAction="#handleDeleteClient"
+                    style="-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 90px;"
+                    text="Supprimer">
+                <font>
+                    <Font name="System Bold" size="11.0" />
+                </font>
+            </Button>
+
+            <Button onAction="#handleAddFacture"
+                    style="-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 110px;"
+                    text="Ajouter Facture">
+                <font>
+                    <Font name="System Bold" size="11.0" />
+                </font>
+            </Button>
         </HBox>
     </bottom>
 </BorderPane>

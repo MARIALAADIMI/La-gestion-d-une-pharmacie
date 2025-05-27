@@ -5,9 +5,6 @@ import entities.Facture;
 import entities.FactureDetails;
 import entities.Medicament;
 
-
-import javax.swing.text.Document;
-import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,21 +12,13 @@ import java.util.List;
 public class FactureDAO {
     private Connection connection;
 
-
+    // Constructeur : initialise la connexion à la base
     public FactureDAO() throws SQLException {
         this.connection = DBConnection.getConnection();
     }
 
-
-
-
-
-
-
-
+    //Met à jour la date d'une facture à la date actuelle.
     public void generateFacture(int idFacture) throws SQLException {
-        // Cette méthode peut être supprimée ou modifiée pour faire autre chose
-        // Exemple alternative : mettre à jour la date
         String query = "UPDATE Facture SET date_Fac = CURRENT_DATE WHERE id_Fac = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, idFacture);
@@ -37,6 +26,7 @@ public class FactureDAO {
         }
     }
 
+    //Récupère toutes les factures d’un client à partir de son CIN.
     public List<Facture> getFacturesByClient(String cin) throws SQLException {
         List<Facture> factures = new ArrayList<>();
         String query = "SELECT * FROM Facture WHERE CIN = ? ORDER BY date_Fac DESC";
@@ -49,9 +39,6 @@ public class FactureDAO {
                     facture.setId_Fac(rs.getInt("id_Fac"));
                     facture.setDate_Fac(rs.getDate("date_Fac"));
                     facture.setMontant_total(rs.getDouble("montant_total"));
-
-
-
                     factures.add(facture);
                 }
             }
@@ -59,12 +46,11 @@ public class FactureDAO {
         return factures;
     }
 
-
+    //Récupère les détails d’une facture (liste des médicaments achetés).
     public List<FactureDetails> getFactureDetails(int idFacture) throws SQLException {
         List<FactureDetails> details = new ArrayList<>();
         String query = "SELECT fd.*, m.nom_Med, m.prix_unitaire FROM Facture_Details fd " +
-                "JOIN Medicament m ON fd.id_Med = m.id_Med " +
-                "WHERE fd.id_Fac = ?";
+                "JOIN Medicament m ON fd.id_Med = m.id_Med WHERE fd.id_Fac = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, idFacture);
@@ -86,9 +72,7 @@ public class FactureDAO {
         return details;
     }
 
-    /**
-     * Ferme la connexion à la base de données
-     */
+    //Ferme proprement la connexion.
     public void close() {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -99,42 +83,32 @@ public class FactureDAO {
         }
     }
 
-
-
+    // Insère une facture dans la base (sans les détails).
     public void createFacture(Facture facture, Connection conn) throws SQLException {
-        if (facture == null) {
-            throw new IllegalArgumentException("Facture cannot be null");
-        }
-        if (conn == null) {
-            throw new IllegalArgumentException("Connection cannot be null");
-        }
-        if (facture.getClient() == null || facture.getClient().getCIN() == null) {
-            throw new IllegalArgumentException("Client CIN cannot be null");
+        if (facture == null || conn == null || facture.getClient() == null || facture.getClient().getCIN() == null) {
+            throw new IllegalArgumentException("Facture, connexion ou client invalide");
         }
 
         String sql = "INSERT INTO facture (CIN, date_Fac, montant_total) VALUES (?, ?, ?)";
-
         try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, facture.getClient().getCIN());
             stmt.setDate(2, facture.getDate_Fac());
             stmt.setDouble(3, facture.getMontant_total());
 
             int affectedRows = stmt.executeUpdate();
-
-            if (affectedRows == 0) {
-                throw new SQLException("Creating facture failed, no rows affected.");
-            }
+            if (affectedRows == 0) throw new SQLException("Échec création facture.");
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     facture.setId_Fac(rs.getInt(1));
                 } else {
-                    throw new SQLException("Creating facture failed, no ID obtained.");
+                    throw new SQLException("ID facture non généré.");
                 }
             }
         }
     }
 
+    //Met à jour le stock des médicaments.
     private void updateMedicamentStock(List<FactureDetails> details, Connection conn) throws SQLException {
         String updateQuery = "UPDATE Medicament SET stock_dispo = stock_dispo - ? WHERE id_Med = ?";
         try (PreparedStatement stmt = conn.prepareStatement(updateQuery)) {
@@ -146,25 +120,21 @@ public class FactureDAO {
             stmt.executeBatch();
         }
     }
+
+    //Crée une facture complète avec ses détails (médicaments) dans une transaction.
     public void createFactureWithDetails(Facture facture, List<FactureDetails> details) throws SQLException {
         Connection conn = null;
         try {
             conn = DBConnection.getConnection();
-            conn.setAutoCommit(false); // Désactive l'auto-commit
+            conn.setAutoCommit(false);
 
-            // 1. Insère la facture et récupère l'ID généré
-            createFacture(facture, conn);
+            createFacture(facture, conn); // insère la facture
 
-            // Vérifie que l'ID a bien été généré
-            if (facture.getId_Fac() == 0) {
-                throw new SQLException("Échec de la génération de l'ID de facture");
-            }
+            if (facture.getId_Fac() == 0) throw new SQLException("ID facture non généré");
 
-            // 2. Insère chaque détail avec l'ID de la facture
+            // insère les détails
             for (FactureDetails detail : details) {
-                // S'assure que la relation est bien établie
-                detail.setFacture(facture);
-
+                detail.setFacture(facture); // lie le détail à la facture
                 String sql = "INSERT INTO Facture_Details (id_Fac, id_Med, quantite, prix_unitaire) VALUES (?, ?, ?, ?)";
                 try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                     stmt.setInt(1, facture.getId_Fac());
@@ -175,15 +145,12 @@ public class FactureDAO {
                 }
             }
 
-            // 3. Met à jour les stocks
-            updateMedicamentStock(details, conn);
+            updateMedicamentStock(details, conn); // met à jour le stock
 
-            conn.commit(); // Valide la transaction
+            conn.commit(); // valide la transaction
         } catch (SQLException e) {
-            if (conn != null) {
-                conn.rollback(); // Annule en cas d'erreur
-            }
-            throw new SQLException("Erreur lors de la création de la facture avec détails: " + e.getMessage(), e);
+            if (conn != null) conn.rollback(); // rollback si erreur
+            throw new SQLException("Erreur lors de la création complète de la facture", e);
         } finally {
             if (conn != null) {
                 try {
@@ -196,7 +163,7 @@ public class FactureDAO {
         }
     }
 
-
+    //Recherche une facture par son ID.
     public Facture findById(int idFacture) throws SQLException {
         String query = "SELECT f.*, c.CIN, c.nom, c.prenom FROM Facture f " +
                 "JOIN Client c ON f.CIN = c.CIN WHERE f.id_Fac = ?";
@@ -207,7 +174,7 @@ public class FactureDAO {
                 if (rs.next()) {
                     Facture facture = new Facture();
                     facture.setId_Fac(rs.getInt("id_Fac"));
-                    // ... initialisez tous les champs
+                    // À compléter si vous souhaitez remplir d’autres champs
                     return facture;
                 }
             }
@@ -215,13 +182,7 @@ public class FactureDAO {
         return null;
     }
 
-
-
-
-
-    //=========================================
-
-
+    //Récupère toutes les factures de tous les clients.
     public List<Facture> getAllFactures() throws SQLException {
         List<Facture> factures = new ArrayList<>();
         String query = "SELECT f.*, c.CIN, c.nom, c.prenom FROM Facture f " +
@@ -248,7 +209,4 @@ public class FactureDAO {
         }
         return factures;
     }
-
-
-
 }

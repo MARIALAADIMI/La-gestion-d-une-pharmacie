@@ -29,12 +29,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TableCell;
-import services.FacturePrinter;
 
 
+//Contrôleur pour la gestion des factures dans l'application pharmacie
 public class FactureController {
-    // Références TableView
+    // TableView pour afficher les médicaments disponibles
     @FXML private TableView<Medicament> medicamentTable;
+
+    // Colonnes de la table des médicaments
     @FXML private TableColumn<Medicament, String> colCodeBarre;
     @FXML private TableColumn<Medicament, String> colNom;
     @FXML private TableColumn<Medicament, String> colForme;
@@ -44,30 +46,35 @@ public class FactureController {
     @FXML private TableColumn<Medicament, String> colRemboursable;
     @FXML private TableColumn<Medicament, String> colDateAjout;
 
-    // Champs FXML
+    // Champs pour les informations client
     @FXML private TextField cinField;
     @FXML private TextField nomField;
     @FXML private TextField prenomField;
     @FXML private ComboBox<String> clientSuggestions;
+
+    // Champs pour la recherche et sélection des médicaments
     @FXML private TextField searchField;
     @FXML private ComboBox<String> medicamentSuggestions;
     @FXML private Spinner<Integer> quantiteSpinner;
+
+    // TableView pour afficher les médicaments sélectionnés pour la facture
     @FXML private TableView<FactureDetails> detailsTable;
     @FXML private Label totalLabel;
 
-
-    // Données
+    // Données de l'application
     private ObservableList<Client> allClients = FXCollections.observableArrayList();
     private ObservableList<String> allCINs = FXCollections.observableArrayList();
     private ObservableList<Medicament> allMedicaments = FXCollections.observableArrayList();
     private ObservableList<FactureDetails> medicamentsList = FXCollections.observableArrayList();
     private ObservableList<Medicament> medicamentsData = FXCollections.observableArrayList();
 
+    // Services
     private IPharmacieService pharmacieService;
     private Client currentClient;
     private Facture facture;
     private Client client;
 
+    //Constructeur initialisant le service pharmacie
     public FactureController() {
         try {
             pharmacieService = new PharmacieServiceImpl();
@@ -77,24 +84,23 @@ public class FactureController {
         }
     }
 
-
-
-
+    //Méthode d'initialisation appelée après le chargement du FXML
     @FXML
     public void initialize() {
-        // Configuration initiale
         configureClientComponents();
         configureMedicamentComponents();
         configureDetailsTable();
 
-        // Chargement des données
+        // Chargement des données initiales
         loadInitialData();
     }
 
+    //Configure les composants relatifs aux clients
     private void configureClientComponents() {
-        // Configuration de l'auto-complétion client
+        // Ecouteur pour l'auto-complétion du CIN client
         cinField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.isEmpty()) {
+                // Filtrage des CIN correspondant à la saisie
                 List<String> suggestions = allCINs.stream()
                         .filter(cin -> cin.toLowerCase().contains(newVal.toLowerCase()))
                         .collect(Collectors.toList());
@@ -105,6 +111,7 @@ public class FactureController {
             }
         });
 
+        // Action lors de la sélection d'une suggestion
         clientSuggestions.setOnAction(e -> {
             String selectedCIN = clientSuggestions.getSelectionModel().getSelectedItem();
             if (selectedCIN != null) {
@@ -113,7 +120,7 @@ public class FactureController {
             }
         });
 
-        // Gestion de Tab
+        // Gestion de la touche Tab pour la complétion
         cinField.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             if (e.getCode() == KeyCode.TAB && !clientSuggestions.getSelectionModel().isEmpty()) {
                 String selectedCIN = clientSuggestions.getSelectionModel().getSelectedItem();
@@ -124,8 +131,9 @@ public class FactureController {
         });
     }
 
+    //Configure les composants relatifs aux médicaments
     private void configureMedicamentComponents() {
-        // Configuration des colonnes
+        // Configuration des colonnes de la table des médicaments
         colCodeBarre.setCellValueFactory(new PropertyValueFactory<>("code_barre"));
         colNom.setCellValueFactory(new PropertyValueFactory<>("nom_Med"));
         colForme.setCellValueFactory(new PropertyValueFactory<>("forme_pharmaceutique"));
@@ -142,7 +150,7 @@ public class FactureController {
             return property;
         });
 
-        // Configuration du spinner
+        // Configuration du spinner pour la quantité (1-100)
         quantiteSpinner.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1));
 
@@ -151,31 +159,29 @@ public class FactureController {
         configureMedicamentAutocomplete();
     }
 
+    //Configure la table des détails de la facture
     private void configureDetailsTable() {
-        // Colonne Médicament
+
         TableColumn<FactureDetails, String> medicamentCol = new TableColumn<>("Médicament");
         medicamentCol.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getMedicament().getNom_Med()));
 
-        // Colonne Quantité
         TableColumn<FactureDetails, Integer> quantiteCol = new TableColumn<>("Quantité");
         quantiteCol.setCellValueFactory(new PropertyValueFactory<>("quantite"));
 
-        // Colonne Prix Unitaire
         TableColumn<FactureDetails, String> prixCol = new TableColumn<>("Prix Unitaire");
         prixCol.setCellValueFactory(cellData -> {
             double prix = cellData.getValue().getMedicament().getPrix_unitaire();
             return new SimpleStringProperty(String.format("%.2f", prix));
         });
 
-        // Colonne Sous-total
         TableColumn<FactureDetails, String> sousTotalCol = new TableColumn<>("Sous-Total");
         sousTotalCol.setCellValueFactory(cellData -> {
             double sousTotal = cellData.getValue().getSousTotal();
             return new SimpleStringProperty(String.format("%.2f", sousTotal));
         });
 
-        // Colonne Action
+        // Colonne Action avec bouton de suppression
         TableColumn<FactureDetails, Void> actionCol = new TableColumn<>("Action");
         actionCol.setCellFactory(param -> new TableCell<>() {
             private final Button deleteBtn = new Button("Supprimer");
@@ -194,14 +200,17 @@ public class FactureController {
             }
         });
 
+        // Ajout des colonnes à la table
         detailsTable.getColumns().setAll(medicamentCol, quantiteCol, prixCol, sousTotalCol, actionCol);
         detailsTable.setItems(medicamentsList);
     }
 
+    //Charge les données initiales (clients et médicaments)
     private void loadInitialData() {
         try {
-            // Chargement des clients
+            // Chargement de tous les clients
             allClients.setAll(pharmacieService.getAllClients());
+            // Extraction des CIN pour l'auto-complétion
             allCINs = allClients.stream()
                     .map(Client::getCIN)
                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
@@ -214,17 +223,20 @@ public class FactureController {
         }
     }
 
+    //Charge les médicaments depuis la base de données
     private void loadMedicaments() throws SQLException {
         allMedicaments.setAll(pharmacieService.getAllMedicaments());
         medicamentsData.setAll(allMedicaments);
         medicamentTable.setItems(medicamentsData);
     }
 
+    //Gère la recherche de client par CIN
     @FXML
     private void handleSearchClient(ActionEvent event) {
         loadClientDetails(cinField.getText().trim());
     }
 
+    //Charge les détails d'un client à partir de son CIN
     private void loadClientDetails(String cin) {
         allClients.stream()
                 .filter(c -> c.getCIN().equalsIgnoreCase(cin))
@@ -240,9 +252,11 @@ public class FactureController {
                 );
     }
 
+    //Configure l'auto-complétion pour les médicaments
     private void configureMedicamentAutocomplete() {
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal.isEmpty()) {
+                // Filtre les médicaments par nom ou code barre
                 List<String> suggestions = allMedicaments.stream()
                         .filter(m -> m.getNom_Med().toLowerCase().contains(newVal.toLowerCase()) ||
                                 (m.getCode_barre() != null && m.getCode_barre().contains(newVal)))
@@ -256,6 +270,7 @@ public class FactureController {
             }
         });
 
+        // Action lors de la sélection d'une suggestion
         medicamentSuggestions.setOnAction(e -> {
             String selected = medicamentSuggestions.getSelectionModel().getSelectedItem();
             if (selected != null) {
@@ -265,6 +280,7 @@ public class FactureController {
         });
     }
 
+    //Configure l'écouteur pour la recherche de médicaments
     private void setupSearchListener() {
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null || newValue.trim().isEmpty()) {
@@ -275,17 +291,20 @@ public class FactureController {
         });
     }
 
+    //Gère la recherche de médicaments
     @FXML
     private void handleSearch(ActionEvent event) {
         performSearch(searchField.getText().trim().toLowerCase());
     }
 
+    //Effectue la recherche de médicaments
     private void performSearch(String searchText) {
         if (searchText.isEmpty()) {
             medicamentTable.setItems(medicamentsData);
             return;
         }
 
+        // Filtre les médicaments selon le texte de recherche
         ObservableList<Medicament> filteredList = allMedicaments.stream()
                 .filter(m -> m.getNom_Med().toLowerCase().contains(searchText) ||
                         (m.getCode_barre() != null && m.getCode_barre().toLowerCase().contains(searchText)))
@@ -298,20 +317,24 @@ public class FactureController {
         }
     }
 
+    //Gère l'ajout d'un médicament à la facture
     @FXML
     private void handleAddMedicament(ActionEvent event) {
+        // Vérification de la sélection
         Medicament selected = medicamentTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert("Erreur", "Veuillez sélectionner un médicament", Alert.AlertType.ERROR);
             return;
         }
 
+        // Vérification de la quantité
         int quantite = quantiteSpinner.getValue();
         if (quantite <= 0) {
             showAlert("Erreur", "La quantité doit être positive", Alert.AlertType.ERROR);
             return;
         }
 
+        // Vérification du stock
         if (selected.getStock_dispo() < quantite) {
             showAlert("Stock insuffisant",
                     String.format("Stock disponible: %d, Quantité demandée: %d",
@@ -320,7 +343,7 @@ public class FactureController {
             return;
         }
 
-        // Vérifier si le médicament existe déjà
+        // Vérifie si le médicament est déjà dans la facture
         boolean exists = false;
         for (FactureDetails detail : medicamentsList) {
             if (detail.getMedicament().getId_Med() == selected.getId_Med()) {
@@ -338,6 +361,7 @@ public class FactureController {
             }
         }
 
+        // Ajout du médicament s'il n'existe pas déjà
         if (!exists) {
             medicamentsList.add(new FactureDetails(selected, quantite));
         }
@@ -346,30 +370,32 @@ public class FactureController {
         selected.setStock_dispo(selected.getStock_dispo() - quantite);
         medicamentTable.refresh();
 
+        // Mise à jour de l'interface
         updateTotal();
         detailsTable.refresh();
     }
 
-
-
+    //Classe interne pour représenter les détails d'une facture
     public class FactureDetails {
         private int quantite;
         private Medicament medicament;
 
+        //Constructeur avec paramètres
         public FactureDetails(Medicament medicament, int quantite) {
             this.medicament = medicament;
             this.quantite = quantite;
         }
 
+        //Constructeur par défaut
         public FactureDetails() {
-
         }
 
+        //Calcule le sous-total pour ce médicament
         public double getSousTotal() {
             return medicament != null ? quantite * medicament.getPrix_unitaire() : 0;
         }
 
-        // Getters et setters...
+        // Getters et setters
         public int getQuantite() {
             return quantite;
         }
@@ -386,6 +412,7 @@ public class FactureController {
         }
     }
 
+    //Met à jour le total de la facture
     private void updateTotal() {
         double total = medicamentsList.stream()
                 .mapToDouble(FactureDetails::getSousTotal)
@@ -393,47 +420,43 @@ public class FactureController {
         totalLabel.setText(String.format("%.2f DH", total));
     }
 
-    // Dans votre contrôleur (FactureController.java)
-    // Supprimer la classe interne FactureDetails qui entre en conflit
-// et utiliser entities.FactureDetails partout
-
+    //Génère le PDF de la facture
     private String generatePdf(Facture facture, List<entities.FactureDetails> details) throws IOException {
-        // Créer le dossier Downloads s'il n'existe pas
+        // Crée le dossier Downloads s'il n'existe pas
         File downloadsDir = new File(System.getProperty("user.home"), "Downloads");
         if (!downloadsDir.exists()) {
             downloadsDir.mkdirs();
         }
 
+        // Nom du fichier PDF
         String fileName = "Facture_" + facture.getId_Fac() + ".pdf";
         File outputFile = new File(downloadsDir, fileName);
 
-        // Chemin vers le logo - ajustez selon votre structure de projet
-
-
-        // Générer le PDF avec le logo
-        // Chemin relatif depuis les ressources (doit commencer par /)
+        // Chemin vers le logo
         String logoPath = "/images/photoPharmacie.png";
 
+        // Génération du PDF
         FacturePrinter.generatePDF(facture, details, outputFile.getAbsolutePath(), logoPath);
 
         return outputFile.getAbsolutePath();
     }
+
+    //Gère la génération de la facture
     @FXML
     private void handleGenerateFacture(ActionEvent event) {
+        // Vérifications préalables
         if (currentClient == null || medicamentsList.isEmpty()) {
             showAlert("Erreur", currentClient == null ?
                             "Aucun client sélectionné" : "Aucun médicament ajouté",
                     Alert.AlertType.ERROR);
             return;
         }
-
         try {
-            // Création de la facture principale
+            // Création de la facture
             Facture facture = new Facture();
             facture.setClient(currentClient);
             facture.setDate_Fac(new java.sql.Date(System.currentTimeMillis()));
             facture.setMontant_total(calculateTotal());
-
 
             // Conversion des détails
             List<entities.FactureDetails> detailsFacture = new ArrayList<>();
@@ -442,7 +465,7 @@ public class FactureController {
                 detail.setMedicament(detailInterne.getMedicament());
                 detail.setQuantite(detailInterne.getQuantite());
                 detail.setPrix_unitaire(detailInterne.getMedicament().getPrix_unitaire());
-                detail.setFacture(facture); // Ceci est crucial!
+                detail.setFacture(facture);
                 detailsFacture.add(detail);
             }
 
@@ -460,6 +483,7 @@ public class FactureController {
                 showAlert("Information", "Facture enregistrée mais impossible d'ouvrir le PDF", Alert.AlertType.INFORMATION);
             }
 
+            // Réinitialisation du formulaire
             resetForm();
 
         } catch (Exception e) {
@@ -467,14 +491,15 @@ public class FactureController {
             e.printStackTrace();
         }
     }
-        //=========================================================
 
+    //Calcule le total de la facture
     private double calculateTotal() {
         return medicamentsList.stream()
                 .mapToDouble(FactureDetails::getSousTotal)
                 .sum();
     }
 
+    //Réinitialise le formulaire
     private void resetForm() {
         medicamentsList.clear();
         cinField.clear();
@@ -484,13 +509,15 @@ public class FactureController {
         quantiteSpinner.getValueFactory().setValue(1);
         currentClient = null;
         try {
-            loadMedicaments(); // Recharger les médicaments pour actualiser les stocks
+            // Recharge les médicaments pour actualiser les stocks
+            loadMedicaments();
         } catch (SQLException e) {
             showAlert("Erreur", "Erreur lors du rechargement des médicaments", Alert.AlertType.ERROR);
         }
         updateTotal();
     }
 
+    //Rafraîchit les données
     @FXML
     private void refreshData(ActionEvent event) {
         try {
@@ -502,6 +529,7 @@ public class FactureController {
         }
     }
 
+    //Affiche une alerte
     private void showAlert(String title, String message, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -510,32 +538,25 @@ public class FactureController {
         alert.showAndWait();
     }
 
+    //Initialise le contrôleur avec un client spécifique
+    public void initWithClient(Client client) {
+        // Remplissage automatique des champs client
+        cinField.setText(client.getCIN());
+        nomField.setText(client.getNom());
+        prenomField.setText(client.getPrenom());
 
-//==================================== add facture =============================
-// Nouvelle méthode pour initialiser avec un client
-public void initWithClient(Client client) {
-    // Remplissage automatique
-    cinField.setText(client.getCIN());
-    nomField.setText(client.getNom());
-    prenomField.setText(client.getPrenom());
+        // Blocage de l'édition
+        cinField.setEditable(false);
+        nomField.setEditable(false);
+        prenomField.setEditable(false);
 
-    // Blocage de l'édition
-    cinField.setEditable(false);
-    nomField.setEditable(false);
-    prenomField.setEditable(false);
+        // Désactivation des suggestions
+        clientSuggestions.setDisable(true);
 
-    // Désactivation des suggestions
-    clientSuggestions.setDisable(true);
+        // Conservation de la référence
+        this.currentClient = client;
 
-    // Conservation de la référence
-    this.currentClient = client;
-
-    // Focus sur la recherche de médicaments
-    Platform.runLater(() -> searchField.requestFocus());
-}
-
-
-
-
-
+        // Focus sur la recherche de médicaments
+        Platform.runLater(() -> searchField.requestFocus());
+    }
 }

@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!-- Importation des classes nécessaires -->
 <?import java.lang.*?>
 <?import javafx.collections.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.control.cell.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="15" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.FactureListController">
+<!-- Conteneur principal vertical avec espacement -->
+<VBox spacing="15" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17.0.2-ea"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.FactureListController">
 
-    <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Liste des Factures:" textFill="#a50f0f" underline="true" />
+    <!-- Titre de la section -->
+    <Label style="-fx-font-size: 16px; -fx-font-weight: bold;"
+           text="Liste des Factures:"
+           textFill="#a50f0f"
+           underline="true" />
 
-    <!-- Barre de recherche -->
+    <!-- Zone de recherche : permet de filtrer les factures par différents critères -->
     <HBox alignment="CENTER_LEFT" spacing="10">
+        <!-- Menu déroulant pour choisir le type de recherche -->
         <ComboBox fx:id="searchTypeCombo" promptText="Rechercher par">
             <items>
                 <FXCollections fx:factory="observableArrayList">
@@ -22,28 +30,57 @@
                 </FXCollections>
             </items>
         </ComboBox>
+
+        <!-- Champ de texte pour saisir le terme à rechercher -->
         <TextField fx:id="searchField" prefWidth="300" promptText="Saisir votre recherche..." />
-        <Button onAction="#handleSearch" style="-fx-base: #2196F3; -fx-text-fill: white;" text="Rechercher" />
-        <Button onAction="#refreshData" style="-fx-base: #607D8B; -fx-text-fill: white;" text="Actualiser" />
-        <Button fx:id="pdfButton" disable="true" onAction="#handleShowPdf" style="-fx-base: #4CAF50; -fx-text-fill: white;" text="Afficher PDF" />
+
+        <!-- Bouton pour lancer la recherche -->
+        <Button onAction="#handleSearch"
+                style="-fx-base: #2196F3; -fx-text-fill: white;"
+                text="Rechercher" />
+
+        <!-- Bouton pour réinitialiser et actualiser les données -->
+        <Button onAction="#refreshData"
+                style="-fx-base: #607D8B; -fx-text-fill: white;"
+                text="Actualiser" />
+
+        <!-- Bouton pour afficher la facture sélectionnée au format PDF (désactivé par défaut) -->
+        <Button fx:id="pdfButton"
+                disable="true"
+                onAction="#handleShowPdf"
+                style="-fx-base: #4CAF50; -fx-text-fill: white;"
+                text="Afficher PDF" />
     </HBox>
 
-    <!-- Tableau des factures -->
+    <!-- Tableau principal pour afficher la liste des factures -->
     <TableView fx:id="factureTable" prefHeight="400">
         <columns>
+            <!-- Colonne numéro de facture -->
             <TableColumn prefWidth="120" text="N° Facture" style="-fx-alignment: CENTER;">
                 <cellValueFactory><PropertyValueFactory property="id_Fac" /></cellValueFactory>
             </TableColumn>
+
+            <!-- Colonne CIN du client -->
             <TableColumn fx:id="cinColumn" prefWidth="100" style="-fx-alignment: CENTER;" text="CIN" />
+
+            <!-- Colonne nom du client -->
             <TableColumn fx:id="nomColumn" prefWidth="150" style="-fx-alignment: CENTER;" text="Nom" />
+
+            <!-- Colonne prénom du client -->
             <TableColumn fx:id="prenomColumn" prefWidth="150" style="-fx-alignment: CENTER;" text="Prénom" />
+
+            <!-- Colonne date de la facture -->
             <TableColumn prefWidth="150" text="Date" style="-fx-alignment: CENTER;">
                 <cellValueFactory><PropertyValueFactory property="date_Fac" /></cellValueFactory>
             </TableColumn>
+
+            <!-- Colonne montant total de la facture -->
             <TableColumn prefWidth="100" text="Montant" style="-fx-alignment: CENTER;">
                 <cellValueFactory><PropertyValueFactory property="montant_total" /></cellValueFactory>
             </TableColumn>
         </columns>
+
+        <!-- Politique de redimensionnement automatique des colonnes -->
         <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
         </columnResizePolicy>

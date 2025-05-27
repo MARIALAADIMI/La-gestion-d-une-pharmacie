@@ -8,13 +8,14 @@ import java.util.List;
 public class MedicamentDAO {
     private static final String TABLE_NAME = "Medicament";
 
+    //Ajoute un nouveau médicament dans la base de données.
     public void addMedicament(Medicament medicament) throws SQLException {
         String sql = "INSERT INTO " + TABLE_NAME + " (code_barre, nom_Med, forme_pharmaceutique, dosage, prix_unitaire, stock_dispo, remboursable) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            conn.setAutoCommit(false);
+            conn.setAutoCommit(false); // Démarre une transaction
 
             ps.setString(1, medicament.getCode_barre());
             ps.setString(2, medicament.getNom_Med());
@@ -27,22 +28,23 @@ public class MedicamentDAO {
             int affectedRows = ps.executeUpdate();
 
             if (affectedRows == 0) {
-                conn.rollback();
+                conn.rollback(); // Annule la transaction en cas d'échec
                 throw new SQLException("Échec de l'ajout, aucune ligne affectée.");
             }
 
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    medicament.setId_Med(generatedKeys.getInt(1));
+                    medicament.setId_Med(generatedKeys.getInt(1)); // Récupère l'ID généré
                 }
             }
 
-            conn.commit();
+            conn.commit(); // Valide la transaction
         } catch (SQLException e) {
             throw new SQLException("Erreur lors de l'ajout du médicament: " + e.getMessage(), e);
         }
     }
 
+    //Vérifie si un médicament existe déjà dans la base selon son code-barres.
     public boolean medicamentExists(String codeBarre) throws SQLException {
         String sql = "SELECT COUNT(*) FROM " + TABLE_NAME + " WHERE code_barre = ?";
 
@@ -60,6 +62,7 @@ public class MedicamentDAO {
         return false;
     }
 
+    //Récupère la liste de tous les médicaments enregistrés.
     public List<Medicament> getAllMedicaments() throws SQLException {
         List<Medicament> medicaments = new ArrayList<>();
         String sql = "SELECT * FROM " + TABLE_NAME;
@@ -86,6 +89,7 @@ public class MedicamentDAO {
         return medicaments;
     }
 
+    //Met à jour les informations d’un médicament.
     public void updateMedicament(Medicament medicament) throws SQLException {
         String sql = "UPDATE " + TABLE_NAME + " SET nom_Med = ?, forme_pharmaceutique = ?, dosage = ?, prix_unitaire = ?, stock_dispo = ?, remboursable = ? WHERE id_Med = ?";
 
@@ -107,6 +111,7 @@ public class MedicamentDAO {
         }
     }
 
+    //Supprime un médicament de la base
     public void deleteMedicament(int idMed) throws SQLException {
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE id_Med = ?";
 
@@ -118,6 +123,7 @@ public class MedicamentDAO {
         }
     }
 
+    //Récupère un médicament par son ID.
     public Medicament getMedicamentById(int idMed) throws SQLException {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE id_Med = ?";
 
@@ -146,9 +152,10 @@ public class MedicamentDAO {
         return null;
     }
 
+    //Recherche des médicaments par mot-clé (nom, code-barre ou forme).
     public List<Medicament> searchMedicaments(String keyword) throws SQLException {
         List<Medicament> medicaments = new ArrayList<>();
-        String searchBy = new String();
+        String searchBy = ""; // ← Ce champ doit être défini de façon dynamique selon le contexte
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE " + getSearchColumn(searchBy) + " LIKE ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -164,7 +171,10 @@ public class MedicamentDAO {
             }
         }
         return medicaments;
-    }private String getSearchColumn(String searchBy) {
+    }
+
+    // Détermine la colonne SQL sur laquelle faire la recherche
+    private String getSearchColumn(String searchBy) {
         switch (searchBy.toLowerCase()) {
             case "nom":
                 return "nom_Med";
@@ -177,6 +187,7 @@ public class MedicamentDAO {
         }
     }
 
+    // Convertit un ResultSet SQL en objet Medicament
     private Medicament extractMedicamentFromResultSet(ResultSet rs) throws SQLException {
         Medicament medicament = new Medicament(
                 rs.getString("code_barre"),
@@ -192,7 +203,7 @@ public class MedicamentDAO {
         return medicament;
     }
 
-
+    //Met à jour le stock disponible pour un médicament donné.
     public void updateStock(int idMedicament, double quantite) throws SQLException {
         String sql = "UPDATE Medicament SET stock_dispo = stock_dispo + ? WHERE id_Med = ?";
 
@@ -209,6 +220,7 @@ public class MedicamentDAO {
         }
     }
 
+    //Méthode de fermeture vide (à implémenter si nécessaire).
     public void close() {
     }
 }

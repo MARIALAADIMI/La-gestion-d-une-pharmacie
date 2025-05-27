@@ -7,13 +7,16 @@ import java.sql.*;
 import java.util.List;
 import java.nio.file.Paths;
 
-
+//Implémentation du service métier principal de la pharmacie.
 
 public class PharmacieServiceImpl implements IPharmacieService {
+
+    // Dépendances DAO pour accéder aux entités en base de données
     private final ClientDAO clientDAO;
     private final MedicamentDAO medicamentDAO;
     private final FactureDAO factureDAO;
 
+    // Constructeur : initialisation des DAOs
     public PharmacieServiceImpl() throws SQLException {
         this.clientDAO = new ClientDAO();
         this.medicamentDAO = new MedicamentDAO();
@@ -21,6 +24,8 @@ public class PharmacieServiceImpl implements IPharmacieService {
     }
 
     // ============ Méthodes Client ============
+
+    // Ajoute un nouveau client dans la base de données
     @Override
     public void addClient(Client client) throws SQLException {
         try {
@@ -30,6 +35,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Récupère tous les clients
     @Override
     public List<Client> getAllClients() throws SQLException {
         try {
@@ -39,6 +45,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Récupère un client par son CIN
     @Override
     public Client getClientByCIN(String cin) throws SQLException {
         try {
@@ -48,6 +55,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Met à jour un client existant
     @Override
     public void updateClient(Client client) throws SQLException {
         try {
@@ -57,6 +65,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Supprime un client à partir de son CIN
     @Override
     public void deleteClient(String CIN) throws SQLException {
         try {
@@ -66,6 +75,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Vérifie si un client existe (via son CIN)
     @Override
     public boolean clientExists(String CIN) throws SQLException {
         try {
@@ -76,6 +86,8 @@ public class PharmacieServiceImpl implements IPharmacieService {
     }
 
     // ============ Méthodes Medicament ============
+
+    // Ajoute un médicament
     @Override
     public void addMedicament(Medicament medicament) throws SQLException {
         try {
@@ -85,6 +97,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Récupère tous les médicaments
     @Override
     public List<Medicament> getAllMedicaments() throws SQLException {
         try {
@@ -94,6 +107,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Recherche des médicaments à partir d’un mot-clé
     @Override
     public List<Medicament> searchMedicaments(String searchTerm) throws SQLException {
         try {
@@ -103,6 +117,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Met à jour les informations d’un médicament
     @Override
     public void updateMedicament(Medicament medicament) throws SQLException {
         try {
@@ -112,6 +127,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Supprime un médicament à partir de son ID
     @Override
     public void deleteMedicament(int idMed) throws SQLException {
         try {
@@ -121,6 +137,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Met à jour le stock d’un médicament
     @Override
     public void updateStock(int idMedicament, int quantite) throws SQLException {
         try {
@@ -130,6 +147,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Vérifie si un médicament existe (via son code barre)
     @Override
     public boolean medicamentExists(String codeBarre) throws SQLException {
         try {
@@ -140,6 +158,8 @@ public class PharmacieServiceImpl implements IPharmacieService {
     }
 
     // ============ Méthodes Facture ============
+
+    // Crée une facture seule (sans détails)
     @Override
     public void createFacture(Facture facture) throws SQLException {
         if (facture == null) {
@@ -147,13 +167,13 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
 
         try (Connection conn = DBConnection.getConnection()) {
-            conn.setAutoCommit(false); // Start transaction
+            conn.setAutoCommit(false); // Démarre une transaction
 
             try {
                 factureDAO.createFacture(facture, conn);
-                conn.commit(); // Commit transaction
+                conn.commit(); // Confirme la transaction
             } catch (SQLException e) {
-                conn.rollback(); // Rollback on error
+                conn.rollback(); // Annule en cas d'erreur
                 throw new SQLException("Failed to create facture: " + e.getMessage(), e);
             }
         } catch (SQLException e) {
@@ -161,6 +181,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Crée une facture avec ses lignes de détail
     @Override
     public void createFactureWithDetails(Facture facture, List<FactureDetails> detailsList) throws SQLException {
         try {
@@ -170,6 +191,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Récupère toutes les factures d’un client
     @Override
     public List<Facture> getFacturesByClient(String CIN) throws SQLException {
         try {
@@ -179,6 +201,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Récupère les détails d’une facture
     @Override
     public List<FactureDetails> getFactureDetails(int idFacture) throws SQLException {
         try {
@@ -188,6 +211,7 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
+    // Met à jour une facture (optionnel, selon votre logique)
     @Override
     public void generateFacture(int idFacture) throws SQLException {
         try {
@@ -197,10 +221,9 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
     }
 
-
+    // Génère un fichier PDF d’une facture
     @Override
     public void generateFacturePDF(Facture facture, String outputPath) throws SQLException, IOException {
-        // Validation des paramètres
         if (facture == null) {
             throw new IllegalArgumentException("La facture ne peut pas être null");
         }
@@ -209,27 +232,21 @@ public class PharmacieServiceImpl implements IPharmacieService {
         }
 
         try {
-            // Récupération des détails de la facture depuis la base de données
             List<FactureDetails> details = factureDAO.getFactureDetails(facture.getId_Fac());
 
-            // Vérification qu'il y a bien des détails
             if (details == null || details.isEmpty()) {
                 throw new SQLException("Aucun détail de facture trouvé pour la facture ID: " + facture.getId_Fac());
             }
 
-            // Chemin vers le logo - à adapter selon votre structure de projet
             String logoPath = "src/main/resources/images/logo_pharmacie.png";
-
-            // Génération du PDF avec le logo
             FacturePrinter.generatePDF(facture, details, outputPath, logoPath);
 
-        } catch (SQLException e) {
-            throw new SQLException("Erreur lors de la récupération des détails de facture: " + e.getMessage(), e);
-        } catch (IOException e) {
-            throw new IOException("Erreur lors de la génération du PDF: " + e.getMessage(), e);
+        } catch (SQLException | IOException e) {
+            throw e;
         }
     }
 
+    // Variante de la méthode PDF en passant seulement l’ID
     public void generateFacturePDF(int idFacture, String outputPath) throws SQLException, IOException {
         Facture facture = factureDAO.findById(idFacture);
         if (facture == null) {
@@ -241,34 +258,24 @@ public class PharmacieServiceImpl implements IPharmacieService {
             throw new SQLException("Aucun détail trouvé pour la facture: " + idFacture);
         }
 
-        // Chemin vers le logo - à adapter selon votre structure de projet
         String logoPath = "src/main/resources/images/logo_pharmacie.png";
-
         FacturePrinter.generatePDF(facture, details, outputPath, logoPath);
     }
-    // ============ Méthodes de fermeture ============
+
+    // Ferme proprement les ressources DAO
     public void close() {
         try {
-            if (clientDAO != null) {
-                clientDAO.close();
-            }
-            if (medicamentDAO != null) {
-                medicamentDAO.close();
-            }
-            if (factureDAO != null) {
-                factureDAO.close();
-            }
+            if (clientDAO != null) clientDAO.close();
+            if (medicamentDAO != null) medicamentDAO.close();
+            if (factureDAO != null) factureDAO.close();
         } catch (Exception e) {
             System.err.println("Erreur lors de la fermeture des DAOs: " + e.getMessage());
         }
     }
 
-
-
-    //=======================================
+    // Récupère toutes les factures enregistrées
     @Override
     public List<Facture> getAllFactures() throws SQLException {
         return factureDAO.getAllFactures();
     }
-
 }
