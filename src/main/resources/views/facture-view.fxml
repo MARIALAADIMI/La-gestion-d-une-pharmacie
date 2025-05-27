@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!-- Imports nécessaires pour JavaFX -->
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.control.cell.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
+<!-- Conteneur principal vertical -->
 <VBox spacing="15" style="-fx-padding: 10;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.FactureController">
 
+    <!-- Titre de la fenêtre -->
     <Label contentDisplay="BOTTOM" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Nouvelle Facture:" textFill="#a50f0f" underline="true">
-      <font>
-         <Font name="System Bold" size="12.0" />
-      </font></Label>
+        <font>
+            <Font name="System Bold" size="12.0" />
+        </font>
+    </Label>
 
-    <!-- Recherche client -->
-
+    <!-- Formulaire de recherche client -->
     <GridPane alignment="CENTER" hgap="10" prefWidth="682.0" vgap="10">
+        <!-- Définition des colonnes avec largeur et alignement -->
         <columnConstraints>
             <ColumnConstraints halignment="RIGHT" prefWidth="80" />
             <ColumnConstraints prefWidth="150" />
@@ -25,47 +29,55 @@
             <ColumnConstraints prefWidth="150" />
         </columnConstraints>
 
-        <!-- Ligne 0 -->
+        <!-- Ligne 0 - Champs de saisie client -->
         <Label text="CIN:" textFill="#2659e6" GridPane.columnIndex="0" GridPane.rowIndex="0">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font></Label>
+            <font>
+                <Font name="System Bold" size="12.0" />
+            </font>
+        </Label>
         <TextField fx:id="cinField" onAction="#handleSearchClient" promptText="Saisir CIN" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
         <Label text="Nom:" textFill="#2659e6" GridPane.columnIndex="2" GridPane.rowIndex="0">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font></Label>
+            <font>
+                <Font name="System Bold" size="12.0" />
+            </font>
+        </Label>
         <TextField fx:id="nomField" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="0" />
 
         <Label text="Prénom:" textFill="#2659e6" GridPane.columnIndex="4" GridPane.rowIndex="0">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font></Label>
+            <font>
+                <Font name="System Bold" size="12.0" />
+            </font>
+        </Label>
         <TextField fx:id="prenomField" editable="false" GridPane.columnIndex="5" GridPane.rowIndex="0" />
 
-        <!-- Suggestions (positionné sous le champ CIN) -->
+        <!-- Suggestions de clients si CIN partiel -->
         <ComboBox fx:id="clientSuggestions" visible="false" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="1" />
-      <rowConstraints>
-         <RowConstraints />
-         <RowConstraints />
-      </rowConstraints>
+
+        <!-- Lignes du GridPane -->
+        <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+        </rowConstraints>
     </GridPane>
-    <!-- Recherche médicament -->
+
+    <!-- Zone de recherche de médicaments -->
     <VBox style="-fx-spacing: 4;">
-        <!-- Barre d'outils -->
+
+        <!-- Barre d'outils pour rechercher, actualiser, et ajouter un médicament -->
         <HBox prefHeight="25.0" prefWidth="742.0" style="-fx-padding: 2; -fx-spacing: 4; -fx-background-color: #eeeeee;">
             <TextField fx:id="searchField" maxWidth="200" prefWidth="200" promptText="Rechercher par code barre ou nom..." />
             <Button onAction="#handleSearch" style="-fx-base: #2196F3; -fx-text-fill: white; -fx-min-width: 80px;" text="Rechercher" />
             <Button onAction="#refreshData" style="-fx-base: #607D8B; -fx-text-fill: white; -fx-min-width: 80px;" text="Actualiser" />
 
+            <!-- Suggestions de médicaments -->
             <ComboBox fx:id="medicamentSuggestions" visible="false" />
             <Label text="Quantité:" />
             <Spinner fx:id="quantiteSpinner" initialValue="1" max="100" min="1" />
             <Button onAction="#handleAddMedicament" style="-fx-base: #4CAF50; -fx-text-fill: white; -fx-min-width: 80px;" text="Ajouter" />
         </HBox>
 
-        <!-- Tableau des médicaments avec style de sélection bleu -->
+        <!-- Tableau des médicaments disponibles -->
         <TableView fx:id="medicamentTable" style="-fx-border-width: 1; -fx-font-size: 12px;">
             <columns>
                 <TableColumn fx:id="colCodeBarre" prefWidth="120" text="Code Barre" />
@@ -77,19 +89,20 @@
                 <TableColumn fx:id="colRemboursable" prefWidth="60" style="-fx-alignment: CENTER;" text="Remb." />
                 <TableColumn fx:id="colDateAjout" prefWidth="90" text="Date Ajout" />
             </columns>
+            <!-- Réglage automatique des tailles de colonnes -->
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
             </columnResizePolicy>
         </TableView>
     </VBox>
 
-
-
-    <!-- Tableau des médicaments sélectionnés -->
+    <!-- Titre de la table des médicaments sélectionnés -->
     <Label style="-fx-font-weight: bold;" text="Médicaments sélectionnés:" textFill="#230ee0" />
+
+    <!-- Tableau récapitulatif des médicaments sélectionnés -->
     <TableView fx:id="detailsTable" prefHeight="350">
         <columns>
-            <!-- Colonne Médicament -->
+            <!-- Médicament -->
             <TableColumn prefWidth="180" text="Médicament">
                 <cellValueFactory><PropertyValueFactory property="medicament.nom" /></cellValueFactory>
                 <styleClass>
@@ -97,7 +110,7 @@
                 </styleClass>
             </TableColumn>
 
-            <!-- Colonne Quantité -->
+            <!-- Quantité -->
             <TableColumn prefWidth="70" text="Quantité">
                 <cellValueFactory><PropertyValueFactory property="quantite" /></cellValueFactory>
                 <styleClass>
@@ -105,7 +118,7 @@
                 </styleClass>
             </TableColumn>
 
-            <!-- Colonne Prix Unitaire -->
+            <!-- Prix Unitaire -->
             <TableColumn prefWidth="90" text="Prix Unitaire">
                 <cellValueFactory><PropertyValueFactory property="medicament.prix_unitaire" /></cellValueFactory>
                 <styleClass>
@@ -113,7 +126,7 @@
                 </styleClass>
             </TableColumn>
 
-            <!-- Colonne Sous-Total -->
+            <!-- Sous-Total -->
             <TableColumn prefWidth="90" text="Sous-Total">
                 <cellValueFactory><PropertyValueFactory property="sousTotal" /></cellValueFactory>
                 <styleClass>
@@ -121,7 +134,7 @@
                 </styleClass>
             </TableColumn>
 
-            <!-- Colonne Action -->
+            <!-- Action (bouton supprimer ou autre) -->
             <TableColumn prefWidth="80" text="Action">
                 <cellValueFactory><PropertyValueFactory property="action" /></cellValueFactory>
                 <styleClass>
@@ -129,11 +142,13 @@
                 </styleClass>
             </TableColumn>
         </columns>
+        <!-- Ajustement automatique des colonnes -->
         <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
         </columnResizePolicy>
     </TableView>
-    <!-- Total et validation -->
+
+    <!-- Ligne affichant le total et bouton de validation -->
     <HBox alignment="CENTER_RIGHT" spacing="20" style="-fx-padding: 10 0 0 0;">
         <Label style="-fx-font-weight: bold; -fx-font-size: 12px;" text="Total:" />
         <Label fx:id="totalLabel" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #2a8bf2;" text="0,00 DH" />

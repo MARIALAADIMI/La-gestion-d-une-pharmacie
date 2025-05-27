@@ -23,10 +23,11 @@ import java.util.Optional;
 import javafx.scene.layout.StackPane;
 import javafx.scene.control.TableCell;
 
-
 public class MedicamentController {
 
-    // Références TableView
+    // === Références aux éléments FXML ===
+
+    // TableView et colonnes
     @FXML private TableView<Medicament> medicamentTable;
     @FXML private TableColumn<Medicament, String> colCodeBarre;
     @FXML private TableColumn<Medicament, String> colNom;
@@ -37,7 +38,7 @@ public class MedicamentController {
     @FXML private TableColumn<Medicament, String> colRemboursable;
     @FXML private TableColumn<Medicament, String> colDateAjout;
 
-    // Références Formulaire
+    // Champs du formulaire
     @FXML private TextField codeBarreField;
     @FXML private TextField nomField;
     @FXML private TextField formeField;
@@ -47,25 +48,14 @@ public class MedicamentController {
     @FXML private CheckBox remboursableCheck;
     @FXML private TextField searchField;
 
-    // Références Boutons
+    // Boutons
     @FXML private Button btnNouveau;
     @FXML private Button btnEnregistrer;
     @FXML private Button btnModifier;
     @FXML private Button btnSupprimer;
     @FXML private Button btnAnnuler;
 
-
-
-
-
-
-
-
-    private final IPharmacieService pharmacieService = new PharmacieServiceImpl();
-    private final ObservableList<Medicament> medicamentsData = FXCollections.observableArrayList();
-    private boolean isEditMode = false;
-    private int currentMedId;
-    // Références pour la modification de stock
+    // Panneau de modification de stock
     @FXML private VBox stockModificationPane;
     @FXML private Label currentStockLabel;
     @FXML private Label newStockLabel;
@@ -74,11 +64,17 @@ public class MedicamentController {
     @FXML private Button btnStockFaible;
     @FXML private Button btnResetView;
 
-    private Medicament selectedMedForStock;
+    // === Variables d'instance ===
+    private final IPharmacieService pharmacieService = new PharmacieServiceImpl();
+    private final ObservableList<Medicament> medicamentsData = FXCollections.observableArrayList();
+    private boolean isEditMode = false; // Mode édition activé/désactivé
+    private int currentMedId; // ID du médicament en cours d'édition
+    private Medicament selectedMedForStock; // Médicament sélectionné pour modification de stock
 
-    public MedicamentController() throws SQLException {
-    }
 
+
+
+    //Initialisation du contrôleur après chargement FXML
     @FXML
     public void initialize() {
         configureTableColumns();
@@ -87,7 +83,7 @@ public class MedicamentController {
         setEditMode(false);
         setupSearchListener();
 
-        // Validation numérique pour la quantité
+        // Validation numérique pour le champ d'ajout de stock
         stockAdditionField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*(\\.\\d*)?")) {
                 stockAdditionField.setText(oldValue);
@@ -95,43 +91,31 @@ public class MedicamentController {
             updateStockCalculation();
         });
 
-
-
-       // Ajoutez cet écouteur pour mettre à jour le médicament sélectionné
-       medicamentTable.getSelectionModel().selectedItemProperty().addListener(
-               (obs, oldSelection, newSelection) -> {
-                   if (newSelection != null) {
-                       selectedMedForStock = newSelection;
-                   }
-               });
-
-
-
-       //===================================================
-
-
+        // Listener pour la sélection dans la table
+        medicamentTable.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldSelection, newSelection) -> {
+                    if (newSelection != null) {
+                        selectedMedForStock = newSelection;
+                    }
+                });
     }
 
+    // === Méthodes pour la gestion du stock ===
 
-
-    // Affiche le panneau de modification de stock
-
+    //Affiche le panneau de modification de stock
     @FXML
     private void showStockModificationPane() {
         selectedMedForStock = medicamentTable.getSelectionModel().getSelectedItem();
         if (selectedMedForStock != null) {
-            // Affiche le stock actuel du médicament sélectionné
             currentStockLabel.setText(String.valueOf(selectedMedForStock.getStock_dispo()));
             stockAdditionField.clear();
-            // Initialise le nouveau stock avec la valeur actuelle
             newStockLabel.setText(String.valueOf(selectedMedForStock.getStock_dispo()));
-
         } else {
             showAlert("Avertissement", "Veuillez sélectionner un médicament", Alert.AlertType.WARNING);
         }
     }
-    // Calcule automatiquement le nouveau stock
 
+    //Calcule et affiche le nouveau stock en fonction de la valeur saisie
     private void updateStockCalculation() {
         if (selectedMedForStock == null) return;
 
@@ -149,6 +133,8 @@ public class MedicamentController {
             newStockLabel.setText("Erreur");
         }
     }
+
+    //Met à jour le médicament sélectionné pour modification de stock
     private void updateSelectedMedicament(Medicament selectedMed) {
         if (selectedMed != null) {
             this.selectedMedForStock = selectedMed;
@@ -158,8 +144,7 @@ public class MedicamentController {
         }
     }
 
-    // Valide la modification du stock
-
+    //Gère la mise à jour du stock après validation
     @FXML
     private void handleStockUpdate() {
         try {
@@ -187,7 +172,6 @@ public class MedicamentController {
             selectedMedForStock.setStock_dispo((int) newStock);
             pharmacieService.updateMedicament(selectedMedForStock);
 
-
             // Après la mise à jour réussie
             medicamentTable.refresh();
             currentStockLabel.setText(String.valueOf(newStock));
@@ -204,24 +188,19 @@ public class MedicamentController {
             showAlert("Erreur BD", "Échec de la mise à jour: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
-
     }
-    // Annule la modification
+
+    //Annule la modification de stock
     @FXML
     private void handleCancelStockUpdate() {
         stockModificationPane.setVisible(false);
     }
 
+    // === Méthodes pour la configuration de la table ===
 
-
-
-
-
-
-
-
-
+    //Configure les colonnes de la table des médicaments
     private void configureTableColumns() {
+        // Liaison des colonnes avec les propriétés des médicaments
         colCodeBarre.setCellValueFactory(new PropertyValueFactory<>("code_barre"));
         colNom.setCellValueFactory(new PropertyValueFactory<>("nom_Med"));
         colForme.setCellValueFactory(new PropertyValueFactory<>("forme_pharmaceutique"));
@@ -237,13 +216,17 @@ public class MedicamentController {
             property.setValue(new SimpleDateFormat("dd/MM/yyyy").format(date));
             return property;
         });
-        medicamentTable.getSortOrder().add(colNom);
+        medicamentTable.getSortOrder().add(colNom); // Tri par nom par défaut
     }
 
+    // === Méthodes pour la gestion des données ===
+
+    //Initialise le formulaire
     private void initializeForm() {
         clearForm();
     }
 
+    //Configure le listener pour la recherche
     private void setupSearchListener() {
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null || newValue.trim().isEmpty()) {
@@ -254,6 +237,7 @@ public class MedicamentController {
         });
     }
 
+    //Gère l'action de recherche
     @FXML
     public void handleSearch(ActionEvent actionEvent) {
         String searchText = searchField.getText();
@@ -264,6 +248,7 @@ public class MedicamentController {
         performSearch(searchText.trim().toLowerCase());
     }
 
+    //Effectue la recherche dans les médicaments
     private void performSearch(String searchText) {
         try {
             ObservableList<Medicament> filteredList = medicamentsData.filtered(medicament ->
@@ -283,9 +268,13 @@ public class MedicamentController {
         }
     }
 
+    // === Méthodes pour la gestion du mode édition ===
+
+    //Active/désactive le mode édition
     private void setEditMode(boolean editMode) {
         isEditMode = editMode;
 
+        // Active/désactive les boutons en fonction du mode
         btnNouveau.setDisable(editMode);
         btnModifier.setDisable(editMode);
         btnSupprimer.setDisable(editMode);
@@ -296,6 +285,9 @@ public class MedicamentController {
         codeBarreField.setDisable(editMode && !codeBarreField.getText().isEmpty());
     }
 
+    // === Méthodes pour la gestion des médicaments ===
+
+    //Gère l'enregistrement d'un médicament (ajout ou modification)
     @FXML
     private void handleSaveMedicament() {
         try {
@@ -326,6 +318,7 @@ public class MedicamentController {
         }
     }
 
+    //Crée un objet Medicament à partir des valeurs du formulaire
     private Medicament prepareMedicamentFromForm() {
         Medicament medicament = new Medicament();
         if (isEditMode) {
@@ -345,7 +338,7 @@ public class MedicamentController {
         return medicament;
     }
 
-
+    //Valide les données du formulaire
     private boolean validateForm() {
         StringBuilder errors = new StringBuilder();
 
@@ -381,6 +374,7 @@ public class MedicamentController {
         return true;
     }
 
+    //Gère la création d'un nouveau médicament
     @FXML
     private void handleNewMedicament() {
         clearForm();
@@ -388,13 +382,12 @@ public class MedicamentController {
         codeBarreField.setDisable(false);
     }
 
-
+    //Gère la modification d'un médicament existant
     @FXML
     private void handleEditMedicament() {
         Medicament selected = medicamentTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            // Stockez l'ID dans un champ caché ou conservez-le dans l'objet
-            currentMedId = selected.getId_Med(); // Ajoutez ce champ à votre classe
+            currentMedId = selected.getId_Med();
             populateForm(selected);
             setEditMode(true);
         } else {
@@ -402,12 +395,14 @@ public class MedicamentController {
         }
     }
 
+    //Gère l'annulation de l'édition
     @FXML
     private void handleCancel() {
         clearForm();
         setEditMode(false);
     }
 
+    //Remplit le formulaire avec les données d'un médicament
     private void populateForm(Medicament medicament) {
         codeBarreField.setText(medicament.getCode_barre());
         nomField.setText(medicament.getNom_Med());
@@ -418,6 +413,7 @@ public class MedicamentController {
         remboursableCheck.setSelected(medicament.isRemboursable());
     }
 
+    //Gère la suppression d'un médicament
     @FXML
     private void handleDeleteMedicament() {
         Medicament selected = medicamentTable.getSelectionModel().getSelectedItem();
@@ -442,6 +438,9 @@ public class MedicamentController {
         }
     }
 
+    // === Méthodes utilitaires ===
+
+    //Charge les médicaments depuis la base de données
     private void loadMedicaments() {
         try {
             List<Medicament> medicaments = pharmacieService.getAllMedicaments();
@@ -453,11 +452,13 @@ public class MedicamentController {
         }
     }
 
+    //Rafraîchit les données de la table
     @FXML
     private void refreshData() {
         loadMedicaments();
     }
 
+    //Réinitialise le formulaire
     @FXML
     private void clearForm() {
         codeBarreField.clear();
@@ -471,6 +472,7 @@ public class MedicamentController {
         codeBarreField.setDisable(false);
     }
 
+    //Affiche une alerte
     private void showAlert(String title, String message, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -479,11 +481,9 @@ public class MedicamentController {
         alert.showAndWait();
     }
 
+    // === Méthodes pour la gestion du stock faible ===
 
-
-//====================================================================
-
-
+    //Affiche les médicaments avec un stock faible (<10)
     @FXML
     private void afficherStockFaible() {
         try {
@@ -503,7 +503,7 @@ public class MedicamentController {
 
             medicamentTable.setItems(medicamentsFaibleStock);
 
-            // Style des lignes
+            // Style des lignes en fonction du niveau de stock
             medicamentTable.setRowFactory(tv -> new TableRow<Medicament>() {
                 @Override
                 protected void updateItem(Medicament med, boolean empty) {
@@ -522,5 +522,6 @@ public class MedicamentController {
             e.printStackTrace();
         }
     }
-
+    public MedicamentController() throws SQLException {
+    }
 }
